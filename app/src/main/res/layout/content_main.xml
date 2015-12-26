@@ -12,16 +12,16 @@
     tools:context="com.qualimony.alcal.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <GridLayout
+    <!--<GridLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:rowCount="5"
         android:columnCount="16"
-        android:id="@+id/gridLayout">
+        android:id="@+id/gridLayout">-->
 
-        <TextView
+        <!--<TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
@@ -61,7 +61,7 @@
             android:clickable="true"
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
-            android:layout_columnSpan="4" />
+            android:layout_columnSpan="4" />-->
 
         <!--<TextView
             android:layout_width="wrap_content"
@@ -434,6 +434,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/day" />-->
 
-    </GridLayout>
+    <!--</GridLayout>-->
 
 </RelativeLayout>
