@@ -12,6 +12,14 @@
     tools:context="com.qualimony.alcal.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/tableLayout">
+    </TableLayout>
+
     <!--<GridLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

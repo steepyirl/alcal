@@ -7,12 +7,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +39,66 @@ public class MainActivity extends AppCompatActivity {
         }
         */
 
-        TableLayout layout = new TableLayout();
+        TableLayout layout = (TableLayout)findViewById(R.id.tableLayout);
+        layout.setStretchAllColumns(true);
+        TableRow row = new TableRow(this);
+        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        row.setLayoutParams(rowParams);
+        TextView selectedMonth = new TextView(this);
+        selectedMonth.setTypeface(face);
+        selectedMonth.setText("364.28.\u26ce");
+        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        rowParams.column = 0;
+        rowParams.span = 8;
+        rowParams.gravity = Gravity.CENTER;
+        row.addView(selectedMonth, rowParams);
+
+        for(int i = 0; i < 7; i++) {
+            TextView v = new TextView(this);
+            v.setText("A");
+            rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+            rowParams.column = 9 + i;
+            rowParams.span = 1;
+            rowParams.gravity = Gravity.CENTER;
+            row.addView(v, rowParams);
+        }
+        layout.addView(row);
+
+        //Second row
+        row = new TableRow(this);
+        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        row.setLayoutParams(rowParams);
+
+        Button v = new Button(this);
+        v.setText("<");
+        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        rowParams.column = 0;
+        rowParams.span = 4;
+        rowParams.gravity = Gravity.CENTER;
+        row.addView(v, rowParams);
+
+        v = new Button(this);
+        v.setText(">");
+        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+        rowParams.column = 4;
+        rowParams.span = 4;
+        rowParams.gravity = Gravity.CENTER;
+        row.addView(v, rowParams);
+
+        addRowForWeek(row);
+
+        layout.addView(row);
+
+        //Third, fourth, fifth row
+        for(int j = 0; j < 3; j++) {
+            row = new TableRow(this);
+            rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+            row.setLayoutParams(rowParams);
+            addRowForWeek(row);
+            layout.addView(row);
+        }
+
+
 
         /*
         GridLayout layout = (GridLayout)findViewById(R.id.gridLayout);
@@ -132,6 +195,18 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    private void addRowForWeek(TableRow row) {
+        for(int i = 0; i < 7; i++) {
+            Button v = new Button(this);
+            TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
+            rowParams.column = 9+i;
+            rowParams.span = 1;
+            rowParams.gravity = Gravity.CENTER;
+            rowParams.width = 50;
+            row.addView(v, rowParams);
+        }
     }
 
     @Override
