@@ -50,12 +50,29 @@ public class MainActivity extends AppCompatActivity {
         layout.setStretchAllColumns(true);
         layout.setShrinkAllColumns(true);
 
+        SelectedMonth selectedMonth = new SelectedMonth(this);
+        selectedMonth.setTypeface(face);
+        selectedMonth.setTime(today);
+        selectedMonth.setTextSize(16);
+        selectedMonth.setMaxLines(1);
+        selectedMonth.setWidth(250);
+
+        DateButton[][] dateButtons = new DateButton[5][7];
+        dateButtons[0][0] = new DateButton(this, 8);
+        dateButtons[0][1] = new DateButton(this, 9);
+        for(int i = 1; i < 5; i++) {
+            for(int j = 0; j < 7; j++) {
+                dateButtons[i][j] = new DateButton(this, j+1);
+            }
+        }
+
+
         //First row
         TableRow row = new TableRow(this);
         TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
         //row.setLayoutParams(rowParams);
 
-        Button currentDate = new Button(this);
+        Button currentDate = new CurrentDateButton(this, selectedMonth);
         currentDate.setTypeface(face);
         currentDate.setText(fullFormat.format(today.getTimeInMillis()));
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
@@ -135,19 +152,13 @@ public class MainActivity extends AppCompatActivity {
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         //row.setLayoutParams(rowParams);
 
-        SelectedMonth selectedMonth = new SelectedMonth(this);
-        selectedMonth.setTypeface(face);
-        selectedMonth.setTime(today);
-        selectedMonth.setTextSize(16);
-        selectedMonth.setMaxLines(1);
-        selectedMonth.setWidth(250);
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
         rowParams.span = 8;
         rowParams.gravity = Gravity.CENTER;
         row.addView(selectedMonth, rowParams);
 
-        addRowForWeek(row);
+        addRowForWeek(dateButtons[1], row);
 
         layout.addView(row);
 
@@ -170,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         rowParams.gravity = Gravity.CENTER;
         row.addView(b, rowParams);
 
-        addRowForWeek(row);
+        addRowForWeek(dateButtons[2], row);
 
         layout.addView(row);
 
@@ -179,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             row = new TableRow(this);
             rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
             //row.setLayoutParams(rowParams);
-            addRowForWeek(row);
+            addRowForWeek(dateButtons[3+j], row);
             layout.addView(row);
         }
 
@@ -197,11 +208,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addRowForWeek(TableRow row) {
+    private void addRowForWeek(DateButton[] buttons, TableRow row) {
         for(int i = 0; i < 7; i++) {
-            Button v = new Button(this);
-            v.setBackgroundColor(0xffff0000);
-            v.setHighlightColor(0xff00ff00);
             TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
             rowParams.column = 8+i;
             //rowParams.span = 1;
@@ -211,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             rowParams.rightMargin = 1;
             rowParams.topMargin = 2;
             rowParams.bottomMargin = 2;
-            row.addView(v, rowParams);
+            row.addView(buttons[i], rowParams);
         }
     }
 
