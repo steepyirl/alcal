@@ -1,21 +1,16 @@
 package com.qualimony.alcal;
 
-import android.app.ActionBar;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.GridLayout;
-import android.widget.Space;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -48,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar cal = Calendar.getInstance();
         KaCalendar today = new KaCalendar();
         today.setTimeInMillis(cal.getTimeInMillis());
-        KaDateFormat monthFormat = new KaDateFormat("G.y.M");
+
         KaDateFormat fullFormat = new KaDateFormat("G.y.MWE");
 
         TableLayout layout = (TableLayout)findViewById(R.id.tableLayout);
@@ -140,12 +135,12 @@ public class MainActivity extends AppCompatActivity {
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         //row.setLayoutParams(rowParams);
 
-        TextView selectedMonth = new TextView(this);
+        SelectedMonth selectedMonth = new SelectedMonth(this);
         selectedMonth.setTypeface(face);
-        selectedMonth.setText(monthFormat.format(today.getTimeInMillis()));
+        selectedMonth.setTime(today);
         selectedMonth.setTextSize(16);
         selectedMonth.setMaxLines(1);
-        selectedMonth.setWidth(200);
+        selectedMonth.setWidth(250);
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
         rowParams.span = 8;
@@ -161,23 +156,19 @@ public class MainActivity extends AppCompatActivity {
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         //row.setLayoutParams(rowParams);
 
-        v = new Button(this);
-        v.setTypeface(face);
-        v.setText("<");
+        Button b = new AdvanceMonthButton(this, face, selectedMonth, -1);
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
         rowParams.span = 4;
         rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
+        row.addView(b, rowParams);
 
-        v = new Button(this);
-        v.setTypeface(face);
-        v.setText(">");
+        b = new AdvanceMonthButton(this, face, selectedMonth, 1);
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 4;
         rowParams.span = 4;
         rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
+        row.addView(b, rowParams);
 
         addRowForWeek(row);
 
