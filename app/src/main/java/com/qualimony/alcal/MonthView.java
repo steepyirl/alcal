@@ -3,11 +3,14 @@ package com.qualimony.alcal;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.Gravity;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.qualimony.ka.KaCalendar;
+
+import java.util.Calendar;
 
 /**
  * Created by petre.popescu on 1/1/2016.
@@ -35,11 +38,12 @@ public class MonthView {
         //Initialize the date buttons
         for(int i = 0; i < 4; i++) {
             for(int j = 0; j < 7; j++) {
-                dateButtons[i][j] = new DateButton(context, j+1);
+                dateButtons[i][j] = new DateButton(context, i+1, j+1);
             }
         }
-        dateButtons[0][7] = new DateButton(context, 8);
-        dateButtons[0][8] = new DateButton(context, 9);
+        for(int j = 7; j < 9; j++) {
+            dateButtons[0][j] = new DateButton(context, 1, j+1);
+        }
     }
 
     public void renderLabels(TableRow row) {
@@ -85,21 +89,55 @@ public class MonthView {
     }
 
     public void setDate(KaCalendar date) {
+        KaCalendar today = new KaCalendar();
+        Calendar cal = Calendar.getInstance();
+        today.setTimeInMillis(cal.getTimeInMillis());
         if(date.get(KaCalendar.KA_MONTH) == 14) {
             setRegularDaysVisibility(TextView.GONE);
             dayLabels[8].setVisibility(TextView.VISIBLE);
             dateButtons[0][8].setVisibility(TextView.VISIBLE);
+            setCurrentDateStatus(today, date, dateButtons[0][8]);
             if(date.isLeapYear()) {
                 dayLabels[7].setVisibility(TextView.VISIBLE);
                 dateButtons[0][7].setVisibility(TextView.VISIBLE);
+                setCurrentDateStatus(today, date, dateButtons[0][7]);
             }
         } else {
             setRegularDaysVisibility(TextView.VISIBLE);
+            setRegularDaysCurrentDateStatus(today, date);
             dayLabels[7].setVisibility(TextView.GONE);
             dateButtons[0][7].setVisibility(TextView.GONE);
             dayLabels[8].setVisibility(TextView.GONE);
             dateButtons[0][8].setVisibility(TextView.GONE);
         }
+    }
+
+    private void setRegularDaysCurrentDateStatus(KaCalendar today, KaCalendar dateSet) {
+        for(int i = 0; i < 4; i++) {
+            for(int j = 0; j < 7; j++) {
+                setCurrentDateStatus(today, dateSet, dateButtons[i][j]);
+            }
+        }
+    }
+
+    private void setCurrentDateStatus(KaCalendar today, KaCalendar dateSet, DateButton button) {
+        if(today.get(KaCalendar.KA_GEN) == dateSet.get(KaCalendar.KA_GEN)
+                && today.get(KaCalendar.KA_YEAR) == dateSet.get(KaCalendar.KA_YEAR)
+                && today.get(KaCalendar.KA_MONTH) == dateSet.get(KaCalendar.KA_MONTH)
+                && today.get(KaCalendar.KA_WEEK) == button.getWeek()
+                && today.get(KaCalendar.KA_DAY) == button.getDay()) {
+            //This button represents the current date
+            button.setBackgroundColor(0xff37e8b7);
+        } else if(button.getDay() <= 5) {
+            //Set weekday color
+            button.setBackgroundColor(0xffd6d6d6);
+        } else {
+            //Set weekend color
+            button.setBackgroundColor(0xffffb9b9);
+        }
+        //Highlight colors:
+        //0xff858585 (weekdays)
+        //0xffff4848 (weekends)
     }
 
     private void setRegularDaysVisibility(int visibility) {

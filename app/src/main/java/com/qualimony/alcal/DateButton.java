@@ -8,15 +8,21 @@ import android.widget.Button;
  */
 public class DateButton extends Button {
 
+    private int week;
     private int day;
 
-    public DateButton(Context context, int day) {
+    public DateButton(Context context, int week, int day) {
         super(context);
+        this.week = week;
         this.day = day;
-        if(day <= 5)
-            setBackgroundColor(0xff606060);
-        else
-            setBackgroundColor(0xff600000);
+    }
+
+    public int getWeek() {
+        return week;
+    }
+
+    public int getDay() {
+        return day;
     }
 
 }
