@@ -22,23 +22,43 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Button currentDate;
+    private SelectedMonth selectedMonth;
+    private Button previousMonth;
+    private Button nextMonth;
+    private MonthView monthView;
+
+    private class MonthAdvanceListener implements View.OnClickListener {
+        public void onClick(View view) {
+            if(view == previousMonth)
+                selectedMonth.advanceMonth(-1);
+            else if(view == nextMonth)
+                selectedMonth.advanceMonth(1);
+            monthView.setDate(selectedMonth.getTime());
+        }
+    }
+
+    private class ResetDateListener implements View.OnClickListener {
+        public void onClick(View view) {
+            selectedMonth.resetDate();
+            monthView.setDate(selectedMonth.getTime());
+        }
+    }
+
+    private ResetDateListener resetDateListener;
+    private MonthAdvanceListener advanceMonthListener;
+
+    public MainActivity() {
+        super();
+        resetDateListener = new ResetDateListener();
+        advanceMonthListener = new MonthAdvanceListener();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Typeface face = Typeface.createFromAsset(getAssets(), "fonts/Quivira.ttf");
-        /*((TextView)this.findViewById(R.id.selectedMonth)).setTypeface(face);
-        ((TextView)this.findViewById(R.id.previous)).setTypeface(face);
-        ((TextView)this.findViewById(R.id.next)).setTypeface(face);
-
-        for(int i = 0; i < 4; i++) {
-            for(int j = 0; j < 7; j++) {
-                TextView tv = new TextView(this);
-                tv.setTypeface(face);
-                tv.setClickable(true);
-            }
-        }
-        */
 
         Calendar cal = Calendar.getInstance();
         KaCalendar today = new KaCalendar();
@@ -50,107 +70,37 @@ public class MainActivity extends AppCompatActivity {
         layout.setStretchAllColumns(true);
         layout.setShrinkAllColumns(true);
 
-        SelectedMonth selectedMonth = new SelectedMonth(this);
+        selectedMonth = new SelectedMonth(this);
         selectedMonth.setTypeface(face);
         selectedMonth.setTime(today);
         selectedMonth.setTextSize(16);
         selectedMonth.setMaxLines(1);
         selectedMonth.setWidth(250);
 
-        DateButton[][] dateButtons = new DateButton[5][7];
-        dateButtons[0][0] = new DateButton(this, 8);
-        dateButtons[0][1] = new DateButton(this, 9);
-        for(int i = 1; i < 5; i++) {
-            for(int j = 0; j < 7; j++) {
-                dateButtons[i][j] = new DateButton(this, j+1);
-            }
-        }
+        monthView = new MonthView(this, face);
 
 
         //First row
         TableRow row = new TableRow(this);
         TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1);
-        //row.setLayoutParams(rowParams);
 
-        Button currentDate = new CurrentDateButton(this, selectedMonth);
+        currentDate = new Button(this);
         currentDate.setTypeface(face);
         currentDate.setText(fullFormat.format(today.getTimeInMillis()));
+        currentDate.setMaxLines(1);
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
         rowParams.span = 8;
         rowParams.gravity = Gravity.CENTER;
         row.addView(currentDate, rowParams);
+        currentDate.setOnClickListener(resetDateListener);
 
-
-        TextView v = new TextView(this);
-        v.setTypeface(face);
-        v.setText("\u263d");
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        rowParams.column = 8;
-        rowParams.span = 1;
-        rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
-
-        v = new TextView(this);
-        v.setTypeface(face);
-        v.setText("\u2642");
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        rowParams.column = 9;
-        rowParams.span = 1;
-        rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
-
-        v = new TextView(this);
-        v.setTypeface(face);
-        v.setText("\u263f");
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        rowParams.column = 10;
-        rowParams.span = 1;
-        rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
-
-        v = new TextView(this);
-        v.setTypeface(face);
-        v.setText("\u2643");
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        rowParams.column = 11;
-        rowParams.span = 1;
-        rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
-
-        v = new TextView(this);
-        v.setTypeface(face);
-        v.setText("\u2640");
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        rowParams.column = 12;
-        rowParams.span = 1;
-        rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
-
-        v = new TextView(this);
-        v.setTypeface(face);
-        v.setText("\u2644");
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        rowParams.column = 13;
-        rowParams.span = 1;
-        rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
-
-        v = new TextView(this);
-        v.setTypeface(face);
-        v.setText("\u2609");
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        rowParams.column = 14;
-        rowParams.span = 1;
-        rowParams.gravity = Gravity.CENTER;
-        row.addView(v, rowParams);
+        monthView.renderLabels(row);
 
         layout.addView(row);
 
         //Second row
         row = new TableRow(this);
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        //row.setLayoutParams(rowParams);
 
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
@@ -158,39 +108,45 @@ public class MainActivity extends AppCompatActivity {
         rowParams.gravity = Gravity.CENTER;
         row.addView(selectedMonth, rowParams);
 
-        addRowForWeek(dateButtons[1], row);
+        monthView.renderDateButtonRow(row, 0, 8);
+
+        monthView.renderCaudalDateButtons(row, 0, 15);
 
         layout.addView(row);
 
         //Third row
         row = new TableRow(this);
-        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-        //row.setLayoutParams(rowParams);
 
-        Button b = new AdvanceMonthButton(this, face, selectedMonth, -1);
+        previousMonth = new Button(this);
+        previousMonth.setTypeface(face);
+        previousMonth.setText("\u2190");
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
         rowParams.span = 4;
         rowParams.gravity = Gravity.CENTER;
-        row.addView(b, rowParams);
+        row.addView(previousMonth, rowParams);
+        previousMonth.setOnClickListener(advanceMonthListener);
 
-        b = new AdvanceMonthButton(this, face, selectedMonth, 1);
+        nextMonth = new Button(this);
+        nextMonth.setTypeface(face);
+        nextMonth.setText("\u2192");
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 4;
         rowParams.span = 4;
         rowParams.gravity = Gravity.CENTER;
-        row.addView(b, rowParams);
+        row.addView(nextMonth, rowParams);
+        nextMonth.setOnClickListener(advanceMonthListener);
 
-        addRowForWeek(dateButtons[2], row);
+        monthView.renderDateButtonRow(row, 1, 8);
 
         layout.addView(row);
+
+        monthView.setDate(today);
 
         //fourth, fifth row
         for(int j = 0; j < 2; j++) {
             row = new TableRow(this);
-            rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-            //row.setLayoutParams(rowParams);
-            addRowForWeek(dateButtons[3+j], row);
+            monthView.renderDateButtonRow(row, 2+j, 8);
             layout.addView(row);
         }
 
@@ -206,21 +162,6 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-    }
-
-    private void addRowForWeek(DateButton[] buttons, TableRow row) {
-        for(int i = 0; i < 7; i++) {
-            TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
-            rowParams.column = 8+i;
-            //rowParams.span = 1;
-            rowParams.gravity = Gravity.CENTER;
-            rowParams.width = 50;
-            rowParams.leftMargin = 1;
-            rowParams.rightMargin = 1;
-            rowParams.topMargin = 2;
-            rowParams.bottomMargin = 2;
-            row.addView(buttons[i], rowParams);
-        }
     }
 
     @Override

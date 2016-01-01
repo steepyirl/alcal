@@ -59,7 +59,7 @@ public class KaCalendar extends Calendar {
 	private static final long MILLIS_IN_5_GROUP = 4 * MILLIS_IN_REGULAR_YEAR + MILLIS_IN_LEAP_YEAR;
 	private static final long MILLIS_IN_GEN = 8 * MILLIS_IN_LEAP_YEAR + 25 * MILLIS_IN_REGULAR_YEAR;
 
-	private boolean isLeapYear = false;
+	private boolean leapYear = false;
 	
 	@Override
 	protected void computeTime() {
@@ -82,7 +82,7 @@ public class KaCalendar extends Calendar {
 		
 		if(fields[KA_MONTH] == 14) {
 			computeLeapYear();
-			if(isLeapYear)
+			if(leapYear)
 				lTime+= (fields[KA_DAY] - 8) * MILLIS_IN_DAY;
 			else
 				; //do nothing - because a full day has not yet elapsed within this month
@@ -121,22 +121,22 @@ public class KaCalendar extends Calendar {
 			//millisInMyGroup = millisInMyGen % MILLIS_IN_5_GROUP;
 			millisInMyGroup = millisInMyGen - (7 * MILLIS_IN_4_GROUP);
 			yearInGroup = (int)(millisInMyGroup / MILLIS_IN_REGULAR_YEAR);
-			isLeapYear = (yearInGroup >= 4);
+			leapYear = (yearInGroup >= 4);
 			if(yearInGroup > 4)
 				yearInGroup = 4;
 			fields[KA_YEAR] = 28 + yearInGroup + 1;
-			if(isLeapYear)
+			if(leapYear)
 				millisInMyYear = millisInMyGroup - (4 * MILLIS_IN_REGULAR_YEAR);
 			else
 				millisInMyYear = millisInMyGroup % MILLIS_IN_REGULAR_YEAR;
 		} else {
 			millisInMyGroup = millisInMyGen % MILLIS_IN_4_GROUP;
 			yearInGroup = (int)(millisInMyGroup / MILLIS_IN_REGULAR_YEAR);
-			isLeapYear = (yearInGroup >= 3);
+			leapYear = (yearInGroup >= 3);
 			if(yearInGroup > 3)
 				yearInGroup = 3;
 			fields[KA_YEAR] = group * 4 + yearInGroup + 1;
-			if(isLeapYear)
+			if(leapYear)
 				millisInMyYear = millisInMyGroup - (3 * MILLIS_IN_REGULAR_YEAR);
 			else
 				millisInMyYear = millisInMyGroup % MILLIS_IN_REGULAR_YEAR;
@@ -164,7 +164,7 @@ public class KaCalendar extends Calendar {
 		fields[KA_DAY] = (int)(millisInMyWeek / MILLIS_IN_DAY) + 1;
 		if(fields[KA_MONTH] == 14) {
 			//these are "special" days
-			if(isLeapYear)
+			if(leapYear)
 				fields[KA_DAY]+= 7;
 			else
 				fields[KA_DAY] = 9;
@@ -382,7 +382,7 @@ public class KaCalendar extends Calendar {
 			if(fields[KA_DAY] == 8)
 				fields[KA_DAY] = 9;
 			else if(fields[KA_DAY] == 9) {
-				if(isLeapYear)
+				if(leapYear)
 					fields[KA_DAY] = 8;
 				else
 					;//stay with 9
@@ -444,16 +444,16 @@ public class KaCalendar extends Calendar {
 	
 	private void computeLeapYear() {
 		if(fields[KA_YEAR] == 33)
-			isLeapYear = true;
+			leapYear = true;
 		else if(fields[KA_YEAR] == 32)
-			isLeapYear = false;
+			leapYear = false;
 		else
-			isLeapYear = ((fields[KA_YEAR] % 4) == 0);
+			leapYear = ((fields[KA_YEAR] % 4) == 0);
 	}
 	
 	private void yearRollAdjust() {
 		computeLeapYear();
-		if(!isLeapYear && fields[KA_DAY] == 8)
+		if(!leapYear && fields[KA_DAY] == 8)
 			fields[KA_DAY] = 9;
 	}
 	
@@ -557,7 +557,7 @@ public class KaCalendar extends Calendar {
 	@Override
 	public int getActualMinimum(int field) {
 		if(field == KA_DAY && fields[KA_MONTH] == 14) {
-			if(isLeapYear)
+			if(leapYear)
 				return 8;
 			else
 				return 9;
@@ -593,6 +593,10 @@ public class KaCalendar extends Calendar {
 	public void set(int field, int value) {
 		// TODO Auto-generated method stub
 		super.set(field, value);
+	}
+
+	public boolean isLeapYear() {
+		return leapYear;
 	}
 
 }
