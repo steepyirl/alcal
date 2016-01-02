@@ -3,6 +3,7 @@ package com.qualimony.alcal;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -13,6 +14,7 @@ import com.qualimony.ka.KaCalendar;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +27,7 @@ public class MonthView implements EventTarget {
     private DateButton[][] dateButtons = new DateButton[4][9];
     private KaCalendar date;
 
-    public MonthView(Context context, Typeface face) {
+    public MonthView(Context context, Typeface face, View.OnClickListener dateButtonClickListener) {
         //Initialize the labels
         for(int i = 0; i < 9; i++) {
             dayLabels[i] = new TextView(context);
@@ -45,10 +47,12 @@ public class MonthView implements EventTarget {
         for(int i = 0; i < 4; i++) {
             for(int j = 0; j < 7; j++) {
                 dateButtons[i][j] = new DateButton(context, i+1, j+1);
+                dateButtons[i][j].setOnClickListener(dateButtonClickListener);
             }
         }
         for(int j = 7; j < 9; j++) {
             dateButtons[0][j] = new DateButton(context, 1, j+1);
+            dateButtons[0][j].setOnClickListener(dateButtonClickListener);
         }
     }
 
@@ -205,9 +209,9 @@ public class MonthView implements EventTarget {
         dayStart.set(KaCalendar.SECOND, 0);
         long dayStartTime = dayStart.getTimeInMillis();
         long dayEndTime = dayStartTime + 86400000L;
-        boolean hasEvents = false;
 
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<Event> dayEvents = new ArrayList<Event>();
         for(Event event : events) {
             long eventStartTime, eventEndTime;
             if(event.getStart().getDateTime() == null)
@@ -218,17 +222,14 @@ public class MonthView implements EventTarget {
                 eventEndTime = event.getEnd().getDate().getValue() + 86400000L;
             else
                 eventEndTime = event.getEnd().getDateTime().getValue();
-            String sEventStartTime = format.format(new Date(eventStartTime));
-            String sEventEndTime = format.format(new Date(eventEndTime));
-            String sDayStartTime = format.format(new Date(dayStartTime));
-            String sDayEndTime = format.format(new Date(dayEndTime));
             if((eventStartTime >= dayStartTime && eventStartTime < dayEndTime) || (eventEndTime > dayStartTime && eventEndTime < dayEndTime) || (eventStartTime < dayStartTime && eventEndTime > dayEndTime)) {
-                hasEvents = true;
+                dayEvents.add(event);
             }
         }
-        if(hasEvents)
-            button.setText("...");
-        else
+        button.setEvents(dayEvents);
+        if(dayEvents.isEmpty())
             button.setText("");
+        else
+            button.setText("...");
     }
 }

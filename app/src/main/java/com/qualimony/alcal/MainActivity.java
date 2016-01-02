@@ -78,6 +78,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private class DaySelectListener implements View.OnClickListener {
+        public void onClick(View view) {
+            DateButton button = (DateButton)view;
+            String text = "";
+            for(Event event : button.getEvents()) {
+                text+= event.toString() + "\n";
+            }
+            mOutputText.setText(text);
+        }
+    }
+
     private ResetDateListener resetDateListener;
     private MonthAdvanceListener advanceMonthListener;
     private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY };
@@ -257,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
         selectedMonth.setMaxLines(1);
         selectedMonth.setWidth(250);
 
-        monthView = new MonthView(this, face);
+        monthView = new MonthView(this, face, new DaySelectListener());
 
 
         //First row
