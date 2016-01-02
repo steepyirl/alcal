@@ -11,11 +11,12 @@ import android.widget.TextView;
 import com.qualimony.ka.KaCalendar;
 
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by petre.popescu on 1/1/2016.
  */
-public class MonthView {
+public class MonthView implements EventTarget {
     private TextView[] dayLabels = new TextView[9];
     private DateButton[][] dateButtons = new DateButton[4][9];
 
@@ -88,8 +89,17 @@ public class MonthView {
         }
     }
 
-    public void setDate(KaCalendar date) {
+    public void setDate(KaCalendar date, EventGetter eventGetter) {
         KaCalendar today = new KaCalendar();
+        KaCalendar eventStartDate = new KaCalendar();
+        eventStartDate.set(KaCalendar.KA_GEN, date.get(KaCalendar.KA_GEN));
+        eventStartDate.set(KaCalendar.KA_YEAR, date.get(KaCalendar.KA_YEAR));
+        eventStartDate.set(KaCalendar.KA_MONTH, date.get(KaCalendar.KA_MONTH));
+        eventStartDate.set(KaCalendar.KA_WEEK, 1);
+        KaCalendar eventEndDate = new KaCalendar();
+        eventEndDate.set(KaCalendar.KA_GEN, date.get(KaCalendar.KA_GEN));
+        eventEndDate.set(KaCalendar.KA_YEAR, date.get(KaCalendar.KA_YEAR));
+        eventEndDate.set(KaCalendar.KA_MONTH, date.get(KaCalendar.KA_MONTH));
         Calendar cal = Calendar.getInstance();
         today.setTimeInMillis(cal.getTimeInMillis());
         if(date.get(KaCalendar.KA_MONTH) == 14) {
@@ -97,10 +107,15 @@ public class MonthView {
             dayLabels[8].setVisibility(TextView.VISIBLE);
             dateButtons[0][8].setVisibility(TextView.VISIBLE);
             setCurrentDateStatus(today, date, dateButtons[0][8]);
+            eventEndDate.set(KaCalendar.KA_WEEK, 1);
+            eventEndDate.set(KaCalendar.KA_DAY, 9);
             if(date.isLeapYear()) {
                 dayLabels[7].setVisibility(TextView.VISIBLE);
                 dateButtons[0][7].setVisibility(TextView.VISIBLE);
                 setCurrentDateStatus(today, date, dateButtons[0][7]);
+                eventStartDate.set(KaCalendar.KA_DAY, 8);
+            } else {
+                eventStartDate.set(KaCalendar.KA_DAY, 9);
             }
         } else {
             setRegularDaysVisibility(TextView.VISIBLE);
@@ -109,7 +124,11 @@ public class MonthView {
             dateButtons[0][7].setVisibility(TextView.GONE);
             dayLabels[8].setVisibility(TextView.GONE);
             dateButtons[0][8].setVisibility(TextView.GONE);
+            eventStartDate.set(KaCalendar.KA_DAY, 1);
+            eventEndDate.set(KaCalendar.KA_WEEK, 4);
+            eventEndDate.set(KaCalendar.KA_DAY, 7);
         }
+        eventGetter.startGetEvents(eventStartDate, eventEndDate, this);
     }
 
     private void setRegularDaysCurrentDateStatus(KaCalendar today, KaCalendar dateSet) {
@@ -149,5 +168,10 @@ public class MonthView {
                 dateButtons[i][j].setVisibility(visibility);
             }
         }
+    }
+
+    @Override
+    public void setEvents(List<String> events) {
+        return;
     }
 }

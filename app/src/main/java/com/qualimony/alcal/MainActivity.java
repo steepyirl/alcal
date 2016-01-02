@@ -67,14 +67,14 @@ public class MainActivity extends AppCompatActivity {
                 selectedMonth.advanceMonth(-1);
             else if(view == nextMonth)
                 selectedMonth.advanceMonth(1);
-            monthView.setDate(selectedMonth.getTime());
+            monthView.setDate(selectedMonth.getTime(), new MakeRequestTask(mCredential));
         }
     }
 
     private class ResetDateListener implements View.OnClickListener {
         public void onClick(View view) {
             selectedMonth.resetDate();
-            monthView.setDate(selectedMonth.getTime());
+            monthView.setDate(selectedMonth.getTime(), new MakeRequestTask(mCredential));
         }
     }
 
@@ -91,9 +91,12 @@ public class MainActivity extends AppCompatActivity {
      * An asynchronous task that handles the Google Calendar API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> implements EventGetter {
         private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
+        private long startTime;
+        private long endTime;
+        private EventTarget target;
 
         public MakeRequestTask(GoogleAccountCredential credential) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
@@ -102,6 +105,14 @@ public class MainActivity extends AppCompatActivity {
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Calendar API Android Quickstart")
                     .build();
+        }
+
+        public void setStartTime(long startTime) {
+            this.startTime = startTime;
+        }
+
+        public void setEndTime(long endTime) {
+            this.endTime = endTime;
         }
 
         /**
@@ -128,12 +139,21 @@ public class MainActivity extends AppCompatActivity {
             // List the next 10 events from the primary calendar.
             DateTime now = new DateTime(System.currentTimeMillis());
             List<String> eventStrings = new ArrayList<String>();
+            /*
             Events events = mService.events().list("primary")
                     .setMaxResults(10)
                     .setTimeMin(now)
                     .setOrderBy("startTime")
                     .setSingleEvents(true)
                     .execute();
+            */
+
+            Events events = mService.events().list("primary")
+                    .setTimeMin(new DateTime(startTime))
+                    .setTimeMax(new DateTime(endTime))
+                    .setSingleEvents(true)
+                    .execute();
+
             List<Event> items = events.getItems();
 
             for (Event event : items) {
@@ -165,6 +185,8 @@ public class MainActivity extends AppCompatActivity {
                 output.add(0, "Data retrieved using the Google Calendar API:");
                 mOutputText.setText(TextUtils.join("\n", output));
             }
+            if(target != null)
+                target.setEvents(output);
         }
 
         @Override
@@ -187,6 +209,14 @@ public class MainActivity extends AppCompatActivity {
                 mOutputText.setText("Request cancelled.");
             }
         }
+
+        @Override
+        public void startGetEvents(KaCalendar startTime, KaCalendar endTime, EventTarget target) {
+            this.target = target;
+            setStartTime(startTime.getTimeInMillis());
+            setEndTime(endTime.getTimeInMillis());
+            execute();
+        }
     }
 
 
@@ -207,6 +237,13 @@ public class MainActivity extends AppCompatActivity {
         today.setTimeInMillis(cal.getTimeInMillis());
 
         KaDateFormat fullFormat = new KaDateFormat("G.y.MWE");
+
+        // Initialize credentials and service object.
+        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
+        mCredential = GoogleAccountCredential.usingOAuth2(
+                getApplicationContext(), Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff())
+                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
 
         TableLayout layout = (TableLayout)findViewById(R.id.tableLayout);
         layout.setStretchAllColumns(true);
@@ -283,8 +320,6 @@ public class MainActivity extends AppCompatActivity {
 
         layout.addView(row);
 
-        monthView.setDate(today);
-
         //fourth, fifth row
         for(int j = 0; j < 2; j++) {
             row = new TableRow(this);
@@ -323,12 +358,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Initialize credentials and service object.
-        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
-        mCredential = GoogleAccountCredential.usingOAuth2(
-                getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff())
-                .setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+        monthView.setDate(today, new MakeRequestTask(mCredential));
     }
 
     @Override
