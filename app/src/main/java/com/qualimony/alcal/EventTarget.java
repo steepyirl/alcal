@@ -1,5 +1,7 @@
 package com.qualimony.alcal;
 
+import com.google.api.services.calendar.model.Event;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,6 @@ import java.util.List;
  */
 public interface EventTarget {
 
-    public void setEvents(List<String> events);
+    public void setEvents(List<Event> events);
 
 }

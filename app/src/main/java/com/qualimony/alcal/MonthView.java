@@ -8,9 +8,13 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.api.services.calendar.model.Event;
 import com.qualimony.ka.KaCalendar;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,6 +23,7 @@ import java.util.List;
 public class MonthView implements EventTarget {
     private TextView[] dayLabels = new TextView[9];
     private DateButton[][] dateButtons = new DateButton[4][9];
+    private KaCalendar date;
 
     public MonthView(Context context, Typeface face) {
         //Initialize the labels
@@ -90,6 +95,7 @@ public class MonthView implements EventTarget {
     }
 
     public void setDate(KaCalendar date, EventGetter eventGetter) {
+        this.date = date;
         KaCalendar today = new KaCalendar();
         KaCalendar eventStartDate = new KaCalendar();
         eventStartDate.set(KaCalendar.KA_GEN, date.get(KaCalendar.KA_GEN));
@@ -127,6 +133,7 @@ public class MonthView implements EventTarget {
             eventStartDate.set(KaCalendar.KA_DAY, 1);
             eventEndDate.set(KaCalendar.KA_WEEK, 4);
             eventEndDate.set(KaCalendar.KA_DAY, 7);
+            eventEndDate.add(KaCalendar.KA_DAY, 1);
         }
         eventGetter.startGetEvents(eventStartDate, eventEndDate, this);
     }
@@ -171,7 +178,57 @@ public class MonthView implements EventTarget {
     }
 
     @Override
-    public void setEvents(List<String> events) {
-        return;
+    public void setEvents(List<Event> events) {
+        //Now populate the buttons
+        if(14 == date.get(KaCalendar.KA_MONTH)) {
+            if(date.isLeapYear()) {
+                setEventsOnDateButton(events, dateButtons[0][7]);
+            }
+            setEventsOnDateButton(events, dateButtons[0][8]);
+        } else {
+            for(int i = 0; i < 4; i++) {
+                for(int j = 0; j < 7; j++) {
+                    setEventsOnDateButton(events, dateButtons[i][j]);
+                }
+            }
+        }
+    }
+
+    private void setEventsOnDateButton(List<Event> events, DateButton button) {
+        KaCalendar dayStart = new KaCalendar();
+        KaCalendar dayEnd = new KaCalendar();
+        dayStart.setTimeInMillis(date.getTimeInMillis());
+        dayStart.set(KaCalendar.KA_WEEK, button.getWeek());
+        dayStart.set(KaCalendar.KA_DAY, button.getDay());
+        dayStart.set(KaCalendar.HOUR, 0);
+        dayStart.set(KaCalendar.MINUTE, 0);
+        dayStart.set(KaCalendar.SECOND, 0);
+        long dayStartTime = dayStart.getTimeInMillis();
+        long dayEndTime = dayStartTime + 86400000L;
+        boolean hasEvents = false;
+
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for(Event event : events) {
+            long eventStartTime, eventEndTime;
+            if(event.getStart().getDateTime() == null)
+                eventStartTime = event.getStart().getDate().getValue();
+            else
+                eventStartTime = event.getStart().getDateTime().getValue();
+            if(event.getEnd().getDateTime() == null)
+                eventEndTime = event.getEnd().getDate().getValue() + 86400000L;
+            else
+                eventEndTime = event.getEnd().getDateTime().getValue();
+            String sEventStartTime = format.format(new Date(eventStartTime));
+            String sEventEndTime = format.format(new Date(eventEndTime));
+            String sDayStartTime = format.format(new Date(dayStartTime));
+            String sDayEndTime = format.format(new Date(dayEndTime));
+            if((eventStartTime >= dayStartTime && eventStartTime < dayEndTime) || (eventEndTime > dayStartTime && eventEndTime < dayEndTime) || (eventStartTime < dayStartTime && eventEndTime > dayEndTime)) {
+                hasEvents = true;
+            }
+        }
+        if(hasEvents)
+            button.setText("...");
+        else
+            button.setText("");
     }
 }

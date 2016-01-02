@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
      * An asynchronous task that handles the Google Calendar API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> implements EventGetter {
+    private class MakeRequestTask extends AsyncTask<Void, Void, List<Event>> implements EventGetter {
         private com.google.api.services.calendar.Calendar mService = null;
         private Exception mLastError = null;
         private long startTime;
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
          * @param params no parameters needed for this task.
          */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected List<Event> doInBackground(Void... params) {
             try {
                 return getDataFromApi();
             } catch (Exception e) {
@@ -132,13 +132,13 @@ public class MainActivity extends AppCompatActivity {
 
         /**
          * Fetch a list of the next 10 events from the primary calendar.
-         * @return List of Strings describing returned events.
+         * @return List of returned events.
          * @throws java.io.IOException
          */
-        private List<String> getDataFromApi() throws IOException {
+        private List<Event> getDataFromApi() throws IOException {
             // List the next 10 events from the primary calendar.
             DateTime now = new DateTime(System.currentTimeMillis());
-            List<String> eventStrings = new ArrayList<String>();
+            List<Event> eventList = new ArrayList<Event>();
             /*
             Events events = mService.events().list("primary")
                     .setMaxResults(10)
@@ -163,10 +163,9 @@ public class MainActivity extends AppCompatActivity {
                     // the start date.
                     start = event.getStart().getDate();
                 }
-                eventStrings.add(
-                        String.format("%s (%s)", event.getSummary(), start));
+                eventList.add(event);
             }
-            return eventStrings;
+            return eventList;
         }
 
 
@@ -177,14 +176,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<String> output) {
+        protected void onPostExecute(List<Event> output) {
             mProgress.hide();
+            /*
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
             } else {
                 output.add(0, "Data retrieved using the Google Calendar API:");
                 mOutputText.setText(TextUtils.join("\n", output));
             }
+            */
             if(target != null)
                 target.setEvents(output);
         }
