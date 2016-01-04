@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     private class DaySelectListener implements View.OnClickListener {
         public void onClick(View view) {
             DateButton button = (DateButton)view;
+            monthView.selectButton(button);
             String text = "";
             for(Event event : button.getEvents()) {
                 text+= event.toString() + "\n";
@@ -279,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
         currentDate.setTypeface(face);
         currentDate.setText(fullFormat.format(today.getTimeInMillis()));
         currentDate.setMaxLines(1);
+        currentDate.setWidth(300);
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
         rowParams.span = 8;

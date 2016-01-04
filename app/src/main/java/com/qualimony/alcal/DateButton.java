@@ -15,11 +15,18 @@ public class DateButton extends Button {
     private int week;
     private int day;
     private List<Event> events;
+    MonthView monthView;
+    boolean current = false;
 
-    public DateButton(Context context, int week, int day) {
+    public DateButton(Context context, MonthView monthView, int week, int day) {
         super(context);
+        this.monthView = monthView;
         this.week = week;
         this.day = day;
+    }
+
+    public MonthView getMonthView() {
+        return monthView;
     }
 
     public int getWeek() {
@@ -36,6 +43,31 @@ public class DateButton extends Button {
 
     public List<Event> getEvents() {
         return events;
+    }
+
+    public void setCurrent(boolean current) {
+        this.current = current;
+        if(current)
+            setBackgroundColor(0xff37e8b7);
+        else {
+            if(day <= 5)
+                setBackgroundColor(0xffd6d6d6);
+            else
+                setBackgroundColor(0xffffb9b9);
+        }
+    }
+
+    public boolean isCurrent() {
+        return current;
+    }
+
+    public void setSelected(boolean selected) {
+        if(!current) {
+            if (day <= 5)
+                setBackgroundColor(selected ? 0xff858585 : 0xffd6d6d6);
+            else
+                setBackgroundColor(selected ? 0xffff4848 : 0xffffb9b9);
+        }
     }
 
 }

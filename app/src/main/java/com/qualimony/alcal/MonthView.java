@@ -26,6 +26,8 @@ public class MonthView implements EventTarget {
     private TextView[] dayLabels = new TextView[9];
     private DateButton[][] dateButtons = new DateButton[4][9];
     private KaCalendar date;
+    private DateButton selectedButton;
+    private DateButton currentDateButton;
 
     public MonthView(Context context, Typeface face, View.OnClickListener dateButtonClickListener) {
         //Initialize the labels
@@ -46,12 +48,12 @@ public class MonthView implements EventTarget {
         //Initialize the date buttons
         for(int i = 0; i < 4; i++) {
             for(int j = 0; j < 7; j++) {
-                dateButtons[i][j] = new DateButton(context, i+1, j+1);
+                dateButtons[i][j] = new DateButton(context, this, i+1, j+1);
                 dateButtons[i][j].setOnClickListener(dateButtonClickListener);
             }
         }
         for(int j = 7; j < 9; j++) {
-            dateButtons[0][j] = new DateButton(context, 1, j+1);
+            dateButtons[0][j] = new DateButton(context, this, 1, j+1);
             dateButtons[0][j].setOnClickListener(dateButtonClickListener);
         }
     }
@@ -98,7 +100,29 @@ public class MonthView implements EventTarget {
         }
     }
 
+    public void selectButton(DateButton button) {
+        if(selectedButton != null)
+            selectedButton.setSelected(false);
+        button.setSelected(true);
+        selectedButton = button;
+    }
+
+    public void unselectAllButtons() {
+        for(int i = 0; i < 4; i++) {
+            for(int j = 0; j < 7; j++) {
+                dateButtons[i][j].setSelected(false);
+            }
+        }
+        for(int i = 7; i < 9; i++) {
+            dateButtons[0][i].setSelected(false);
+        }
+    }
+
     public void setDate(KaCalendar date, EventGetter eventGetter) {
+        if(currentDateButton != null) {
+            currentDateButton.setCurrent(false);
+            currentDateButton = null;
+        }
         this.date = date;
         KaCalendar today = new KaCalendar();
         KaCalendar eventStartDate = new KaCalendar();
@@ -112,6 +136,7 @@ public class MonthView implements EventTarget {
         eventEndDate.set(KaCalendar.KA_MONTH, date.get(KaCalendar.KA_MONTH));
         Calendar cal = Calendar.getInstance();
         today.setTimeInMillis(cal.getTimeInMillis());
+        unselectAllButtons();
         if(date.get(KaCalendar.KA_MONTH) == 14) {
             setRegularDaysVisibility(TextView.GONE);
             dayLabels[8].setVisibility(TextView.VISIBLE);
@@ -157,17 +182,9 @@ public class MonthView implements EventTarget {
                 && today.get(KaCalendar.KA_WEEK) == button.getWeek()
                 && today.get(KaCalendar.KA_DAY) == button.getDay()) {
             //This button represents the current date
-            button.setBackgroundColor(0xff37e8b7);
-        } else if(button.getDay() <= 5) {
-            //Set weekday color
-            button.setBackgroundColor(0xffd6d6d6);
-        } else {
-            //Set weekend color
-            button.setBackgroundColor(0xffffb9b9);
+            button.setCurrent(true);
+            currentDateButton = button;
         }
-        //Highlight colors:
-        //0xff858585 (weekdays)
-        //0xffff4848 (weekends)
     }
 
     private void setRegularDaysVisibility(int visibility) {
