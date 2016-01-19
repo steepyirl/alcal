@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Space;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -281,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
         currentDate.setText(fullFormat.format(today.getTimeInMillis()));
         currentDate.setMaxLines(1);
         currentDate.setWidth(300);
+        currentDate.setTextSize(12);
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
         rowParams.span = 8;
@@ -341,7 +343,32 @@ public class MainActivity extends AppCompatActivity {
             layout.addView(row);
         }
 
-        //sixth row
+        for(int hour = 0; hour < 24; hour++) {
+            row = new TableRow(this);
+            rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
+            rowParams.column = 0;
+            rowParams.span = 2;
+            rowParams.gravity = Gravity.CENTER;
+
+            TextView hourLabel = new TextView(this);
+            hourLabel.setTypeface(face);
+            hourLabel.setTextSize(20);
+            hourLabel.setText(String.valueOf(hour));
+            row.addView(hourLabel, rowParams);
+            layout.addView(row);
+
+            row = new TableRow(this);
+            rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
+            rowParams.column = 0;
+            rowParams.span = 2;
+            rowParams.gravity = Gravity.CENTER;
+
+            Space space = new Space(this);
+            row.addView(space, rowParams);
+            layout.addView(row);
+        }
+
+        //last row
         row = new TableRow(this);
         rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
         rowParams.column = 0;
