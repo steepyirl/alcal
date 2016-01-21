@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Space;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private Button previousMonth;
     private Button nextMonth;
     private MonthView monthView;
+    private ListView dayEventsView;
 
     private class MonthAdvanceListener implements View.OnClickListener {
         public void onClick(View view) {
@@ -343,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
             layout.addView(row);
         }
 
+        /*
         for(int hour = 0; hour < 24; hour++) {
             row = new TableRow(this);
             rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
@@ -367,6 +370,18 @@ public class MainActivity extends AppCompatActivity {
             row.addView(space, rowParams);
             layout.addView(row);
         }
+        */
+
+        row = new TableRow(this);
+        rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 0);
+        rowParams.column = 0;
+        rowParams.span = 17;
+        rowParams.gravity = Gravity.CENTER;
+
+        dayEventsView = new ListView(this);
+        dayEventsView.setLayoutParams(rowParams);
+        row.addView(dayEventsView, rowParams);
+        layout.addView(row);
 
         //last row
         row = new TableRow(this);
