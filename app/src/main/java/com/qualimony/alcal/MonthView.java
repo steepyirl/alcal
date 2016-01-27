@@ -243,6 +243,7 @@ public class MonthView implements EventTarget {
                 dayEvents.add(event);
             }
         }
+        button.setMonth(date.get(KaCalendar.KA_GEN), date.get(KaCalendar.KA_YEAR), date.get(KaCalendar.KA_MONTH));
         button.setEvents(dayEvents);
         if(dayEvents.isEmpty())
             button.setText("");

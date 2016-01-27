@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private Button nextMonth;
     private MonthView monthView;
     private ListView dayEventsView;
+    private DayEventsAdapter dayEventsAdapter;
 
     private class MonthAdvanceListener implements View.OnClickListener {
         public void onClick(View view) {
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 text+= event.toString() + "\n";
             }
             mOutputText.setText(text);
+            dayEventsAdapter.setCalendarData(button.getEvents());
         }
     }
 
@@ -378,8 +380,11 @@ public class MainActivity extends AppCompatActivity {
         rowParams.span = 17;
         rowParams.gravity = Gravity.CENTER;
 
+        dayEventsAdapter = new DayEventsAdapter(this, face);
+
         dayEventsView = new ListView(this);
         dayEventsView.setLayoutParams(rowParams);
+        dayEventsView.setAdapter(dayEventsAdapter);
         row.addView(dayEventsView, rowParams);
         layout.addView(row);
 

@@ -14,6 +14,10 @@ public class DateButton extends Button {
 
     private int week;
     private int day;
+
+    private int cycle;
+    private int year;
+    private int month;
     private List<Event> events;
     MonthView monthView;
     boolean current = false;
@@ -29,6 +33,18 @@ public class DateButton extends Button {
         return monthView;
     }
 
+    public int getCycle() {
+        return cycle;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
     public int getWeek() {
         return week;
     }
@@ -39,6 +55,12 @@ public class DateButton extends Button {
 
     public void setEvents(List<Event> events) {
         this.events = events;
+    }
+
+    public void setMonth(int cycle, int year, int month) {
+        this.cycle = cycle;
+        this.year = year;
+        this.month = month;
     }
 
     public List<Event> getEvents() {
